@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# SK Seems like this file has stuff for processing files and and processing features.
+# SK It is almost entirely functions, with only a Data Pipeline and an Alignment Runner class.
 import os
 import copy
 import collections
@@ -62,7 +64,7 @@ def make_template_features(
 
     return template_features
 
-
+# SK Combine all templates into one.
 def unify_template_features(
     template_feature_list: Sequence[FeatureDict]
 ) -> FeatureDict:
@@ -1150,7 +1152,8 @@ class DataPipeline:
             **template_features,
         }
 
-
+# SK There is some original code here.
+# SK Seems to me that this is quite a bit different from the OF Data Pipeline.
 class DataPipelineMultimer:
     """Runs the alignment tools and assembles the input features."""
 

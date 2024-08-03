@@ -40,7 +40,7 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
                  filter_path: Optional[str] = None,
                  mode: str = "train",
                  alignment_index: Optional[Any] = None,
-                 _output_raw: bool = False,
+                 _output_raw: bool = False,     # SK: Not even used anywhere, so why even have this? 2. Why so many args in the constructor?
                  _structure_index: Optional[Any] = None,
                  ):
         """
@@ -288,7 +288,10 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self._chain_ids)
 
-
+# SK Arguments are literally the same as Single Dataset, except using MMCIF data cache instead of chain data cache.
+# SK which I think may be because of using an entire MMCIF as a multimer.
+# SK Apparently this is the same MMCIF cache as the one used alongside the chain data cache all along.  
+# SK This one only supports MMCIFs and the OF Single Dataset supports PDBs, MMCIFs, and CORE files.
 class OpenFoldSingleMultimerDataset(torch.utils.data.Dataset):
     def __init__(self,
                  data_dir: str,
@@ -503,7 +506,7 @@ class OpenFoldSingleMultimerDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self._mmcifs)
 
-
+# SK Filters
 def resolution_filter(resolution: int, max_resolution: float) -> bool:
     """Check that the resolution is <= max_resolution permitted"""
     return resolution is not None and resolution <= max_resolution
@@ -660,7 +663,9 @@ class OpenFoldDataset(torch.utils.data.Dataset):
             datapoint_idx = next(samples)
             self.datapoints.append((dataset_idx, datapoint_idx))
 
-
+# SK Nothing original here. The code is copied line by line.
+# SK BTW it extends the OF Dataset class.
+# SK But talking about the code itself, it has data filtering functions and functions for yielding samples.
 class OpenFoldMultimerDataset(OpenFoldDataset):
     """
     Create a torch Dataset object for multimer training and 
@@ -758,7 +763,8 @@ class OpenFoldBatchCollator:
         stack_fn = partial(torch.stack, dim=0)
         return dict_multimap(stack_fn, prots)
 
-
+# SK Prepare a sample batch and add batch properties to it.
+# SK Not clear yet whether the samples are from a single dataset, or a mix of datasets.
 class OpenFoldDataLoader(torch.utils.data.DataLoader):
     def __init__(self, *args, config, stage="train", generator=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -769,10 +775,11 @@ class OpenFoldDataLoader(torch.utils.data.DataLoader):
 
     def _prep_batch_properties_probs(self):
         keyed_probs = []
+        # SK Get `maximum recycling iterations` allowed, and uniform recycling flag from config
         stage_cfg = self.config[self.stage]
 
         max_iters = self.config.common.max_recycling_iters
-
+        # SK Uniform probability for all in range `[0, max_iters]`
         if stage_cfg.uniform_recycling:
             recycling_probs = [
                 1. / (max_iters + 1) for _ in range(max_iters + 1)
@@ -782,7 +789,7 @@ class OpenFoldDataLoader(torch.utils.data.DataLoader):
                 0. for _ in range(max_iters + 1)
             ]
             recycling_probs[-1] = 1.
-
+        # SK I don't really understand what is happening here
         keyed_probs.append(
             ("no_recycling_iters", recycling_probs)
         )
@@ -791,11 +798,12 @@ class OpenFoldDataLoader(torch.utils.data.DataLoader):
         max_len = max([len(p) for p in probs])
         padding = [[0.] * (max_len - len(p)) for p in probs]
 
-        self.prop_keys = keys
+        self.prop_keys = keys       # SK Looks like `('no_recycling_iters')`
         self.prop_probs_tensor = torch.tensor(
             [p + pad for p, pad in zip(probs, padding)],
             dtype=torch.float32,
         )
+        # SK `[[0.2, 0.2, 0.2, 0.2, 0.2]]` for `max_iters = 4`.
 
     def _add_batch_properties(self, batch):
         gt_features = batch.pop('gt_features', None)
@@ -844,6 +852,7 @@ class OpenFoldDataLoader(torch.utils.data.DataLoader):
 
         return _batch_prop_gen(it)
 
+# SK Create a multi-dataset, one for each training stage, and generate data loaders for each.
 
 class OpenFoldDataModule(pl.LightningDataModule):
     def __init__(self,
@@ -1058,7 +1067,8 @@ class OpenFoldDataModule(pl.LightningDataModule):
     def predict_dataloader(self):
         return self._gen_dataloader("predict")
 
-
+# SK Almost all the code is the same as OF Data Module
+# SK But what it does is create a multi-dataset of multimers for each training stage, and generate a dataloader for each.
 class OpenFoldMultimerDataModule(OpenFoldDataModule):
     """
     Create a datamodule specifically for multimer training
