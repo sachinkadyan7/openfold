@@ -402,7 +402,7 @@ def main(args):
                 entity=args.wandb_entity
             )
             wandb.run = wandb.init(**wandb_init_dict)
-            wandb.watch(model_module.model, log='all')
+            wandb.watch(model_module.model, log='all', log_freq=20)
 
         wdb_logger = WandbLogger(
             name=args.experiment_name,
@@ -441,7 +441,6 @@ def main(args):
         'strategy': strategy,
         'callbacks': callbacks,
         'logger': loggers,
-        'detect_anomaly': True,
     })
     trainer = pl.Trainer(**trainer_args)
 
