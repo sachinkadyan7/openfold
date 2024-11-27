@@ -10,3 +10,8 @@ data
 openfold/resources/
 tests/test_data/
 cutlass/
+
+# SK
+/*.slurm
+/*.out
+/*.sh
