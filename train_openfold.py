@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from pytorch_lightning.callbacks import DeviceStatsMonitor
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
-from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.loggers import WandbLogger, TensorBoardLogger
 from pytorch_lightning.strategies import DDPStrategy, DeepSpeedStrategy
 from pytorch_lightning.plugins.environments import MPIEnvironment
 from pytorch_lightning import seed_everything
@@ -404,6 +404,10 @@ def main(args):
             wandb.run = wandb.init(**wandb_init_dict)
             wandb.log({'step': 0})
             wandb.watch(model_module.model, log='all', log_freq=1)
+
+            tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
+                                          name=args.experiment_name)
+            loggers.append(tb_logger)
 
         wdb_logger = WandbLogger(
             name=args.experiment_name,
