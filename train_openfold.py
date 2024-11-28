@@ -410,7 +410,6 @@ def main(args):
             project=args.wandb_project,
             **{"entity": args.wandb_entity}
         )
-        wandb.watch(model_module.model, log='all', log_freq=20)
         loggers.append(wdb_logger)
 
         tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
@@ -448,6 +447,8 @@ def main(args):
     })
     trainer = pl.Trainer(**trainer_args)
 
+    if (args.wandb):
+        wdb_logger.experiment.watch(model_module.model, log='all', log_freq=20)
 
     if (args.resume_model_weights_only):
         ckpt_path = None
