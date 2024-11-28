@@ -410,6 +410,7 @@ def main(args):
             project=args.wandb_project,
             **{"entity": args.wandb_entity}
         )
+        wandb.watch(model_module.model, log='all', log_freq=20)
         loggers.append(wdb_logger)
 
         tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
