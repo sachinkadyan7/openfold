@@ -403,10 +403,6 @@ def main(args):
             )
             wandb.run = wandb.init(**wandb_init_dict)
 
-            tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
-                                          name=args.experiment_name)
-            loggers.append(tb_logger)
-
         wdb_logger = WandbLogger(
             name=args.experiment_name,
             save_dir=args.output_dir,
@@ -415,6 +411,10 @@ def main(args):
             **{"entity": args.wandb_entity}
         )
         loggers.append(wdb_logger)
+
+        tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
+                                        name=args.experiment_name)
+        loggers.append(tb_logger)
 
     cluster_environment = MPIEnvironment() if args.mpi_plugin else None
     if(args.deepspeed_config_path is not None):
