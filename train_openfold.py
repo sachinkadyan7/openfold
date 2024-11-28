@@ -402,8 +402,6 @@ def main(args):
                 entity=args.wandb_entity
             )
             wandb.run = wandb.init(**wandb_init_dict)
-            wandb.log({'step': 0})
-            wandb.watch(model_module.model, log='all', log_freq=1)
 
             tb_logger = TensorBoardLogger(save_dir=os.path.join(args.output_dir, "tensorboard/"),
                                           name=args.experiment_name)
