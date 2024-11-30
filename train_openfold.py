@@ -445,6 +445,8 @@ def main(args):
     })
     trainer = pl.Trainer(**trainer_args)
 
+    if (args.wandb):
+        wdb_logger.experiment.watch(model_module.model, log='all', log_freq=100)
 
     if (args.resume_model_weights_only):
         ckpt_path = None
