@@ -10,7 +10,7 @@
 #SBATCH -t 08:00:00
 
 source ~/.bashrc
-scontrol write batch_script ${SLURM_JOB_ID}
+scontrol write batch_script ${SLURM_JOB_ID} -
 cd /global/cfs/cdirs/m4351/sk844/openfold-pytorch2-instability-issue/openfold
 conda activate ../openfold-pytorch2-env
 module load cudatoolkit/12.2
