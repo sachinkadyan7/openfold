@@ -15,6 +15,12 @@ cd /global/cfs/cdirs/m4351/sk844/openfold-pytorch2-instability-issue/openfold
 conda activate ../openfold-pytorch2-env
 module load cudatoolkit/12.2
 
+# Print current git details
+echo "Git Details (Branch is detached if empty)"
+echo "Branch = $(git symbolic-ref -q --short HEAD)"
+echo "Commit Hash = $(git rev-parse HEAD)"
+echo "Commit Message = $(git --no-pager show -s --format=%s)"
+
 export NUM_NODES=$SLURM_NNODES
 export LD_LIBRARY_PATH=/global/cfs/cdirs/m4351/sk844/openfold-pytorch2-env/lib:$LD_LIBRARY_PATH
 export DATA_DIR=/global/cfs/cdirs/m4351/openfold_reference_datasets/
