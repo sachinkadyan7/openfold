@@ -440,6 +440,7 @@ def main(args):
         'strategy': strategy,
         'callbacks': callbacks,
         'logger': loggers,
+        'detect_anomaly': True,
     })
     trainer = pl.Trainer(**trainer_args)
 
